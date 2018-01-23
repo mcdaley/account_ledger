@@ -1,6 +1,18 @@
 # README
 
 ## To Do
+1. Build the rails API to return the JSON responses
+2. Add a transaction
+3. Edit a transaction
+4. Delete a transaction
+5. Add account balance to top of the form
+6. Running balance
+
+## Questions
+1. How do I load transactions on the initial page load for transactions#index?
+   a.) Want to make the AJAX call to the index controller when the page loads to get the transactions.
+   b.) Right now I'm loading from an embedded JSON array.
+   c.) Should be able to see example from reactjs video tutorial
 
 ### Bootstrap
 1. Link to CDN

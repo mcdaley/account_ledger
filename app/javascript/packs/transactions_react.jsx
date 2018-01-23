@@ -6,9 +6,16 @@ import ReactDOM     from 'react-dom';
 import moment       from 'moment';
 import numeral      from 'numeral';
 
+// Format date string into MM/DD/YYYYY format
+function formatDate(date) {
+  let     date_str = moment(date).format('MM/DD/YYYY')
+  return  date_str
+}
+
+// Format number into currency
 function formatCurrency(number) {
-  let currency = numeral(number).format('$0,0.00');
-  return currency;
+  let     currency = numeral(number).format('$0,0.00');
+  return  currency;
 }
 
 class TransactionRow extends React.Component {
@@ -19,9 +26,9 @@ class TransactionRow extends React.Component {
     
     return (
       <tr>
-        <td className="text-left">  {transaction.date} </td>
-        <td className="text-left">  {transaction.description}  </td>
-        <td className="text-right"> {formatCurrency(transaction.amount)}       </td>
+        <td className="text-left">  {formatDate(transaction.date)}        </td>
+        <td className="text-left">  {transaction.description}             </td>
+        <td className="text-right"> {formatCurrency(transaction.amount)}  </td>
       </tr>
     )
   }
@@ -57,22 +64,41 @@ class Ledger extends React.Component {
   
   constructor(props) {
     super(props);
-
+    
     this.state = {
       transactions: this.props.transactions,
     };
   }
   
+/******************************************************************** 
+  //
+  // Use componebtDidMount() to load the data from an AJAX request.
+  // Code below is extracting from the data attribute of an <div>
+  // 
+  componentDidMount() {
+    console.log("Entered componentDidMount")
+      
+    let ledger        = document.getElementById('ledger')
+    let transactions  = JSON.parse(ledger.dataset.transactions)
+    
+    this.setState({
+      transactions: transactions,
+    })
+  }
+*********************************************************************/
+  
   /////////////////////////////////////////////////////////////////////////////
   // TODO: 1/22/2018
   // - Need to figure out why I can't add more methods to the ES6 objects, I
   //   always get an error if I call logger
+  //
+  // - Need to preface the API calls with this.logger(txn)
   /////////////////////////////////////////////////////////////////////////////
   logger(tnx) {
     console.log("DBG: Entered transaction logger")
   }
   
-  render() {
+  render() {    
     return (
       <div>
         <h1>Account Ledger</h1>
@@ -84,23 +110,26 @@ class Ledger extends React.Component {
 
 //-----------------------------------------------------------------------------
 // TODO: 01/20/2018
-// - IN THE RAILS API THE DATES IN THE JSON OBJECT WILL BE STRINGS, SO NEED
-//   TO THINK ABOUT HOW I SHOULD HANDLE THEM. WOULD I CONVERT TO DATE OBJECTS
-//   AND THEN FORMAT AS STRINGS?
+// - For design of react components used hard-coded data. Commented out 
+//   after retrieving transactions from the database.
 //-----------------------------------------------------------------------------
-const monday    = moment("2018-01-15").format("MM/DD/YYYY")
-const tuesday   = moment("2018-01-16").format("MM/DD/YYYY")
-const wednesday = moment("2018-01-17").format("MM/DD/YYYY")
 
-const TRANSACTIONS = [
-  { description: "EWS",     date: monday,     amount:  500.00 },
-  { description: "Target",  date: monday,     amount: -100.00 },
-  { description: "Safeway", date: tuesday,    amount:  -55.00 },
-  { description: "Hello",   date: wednesday,  amount:  -15.00 },
-]
+/********************************************************************
+  const monday    = moment("2018-01-15").format("MM/DD/YYYY")
+  const tuesday   = moment("2018-01-16").format("MM/DD/YYYY")
+  const wednesday = moment("2018-01-17").format("MM/DD/YYYY")
 
+  const TRANSACTIONS = [
+    { description: "EWS",     date: monday,     amount:  500.00 },
+    { description: "Target",  date: monday,     amount: -100.00 },
+    { description: "Safeway", date: tuesday,    amount:  -55.00 },
+    { description: "Hello",   date: wednesday,  amount:  -15.00 },
+  ]
+*********************************************************************/
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("DBG: Loading the Ledger component")
-  ReactDOM.render(<Ledger transactions={TRANSACTIONS} />, document.getElementById('ledger'))
+  let ledger        = document.getElementById('ledger')
+  let transactions  = JSON.parse(ledger.dataset.transactions)
+
+  ReactDOM.render(<Ledger transactions={transactions} />, ledger)
 })

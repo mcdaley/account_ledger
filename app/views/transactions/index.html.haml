@@ -3,7 +3,7 @@
 -# ----------------------------------------------------------------------------
 %div.row
   %div.col-8
-    %div#ledger
+    %div#ledger{ data: {transactions: @transactions_json} }
   %div.col-4
   
 = javascript_pack_tag "transactions_react"
