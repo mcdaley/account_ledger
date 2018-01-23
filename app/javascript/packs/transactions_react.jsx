@@ -4,17 +4,24 @@
 import React        from 'react';
 import ReactDOM     from 'react-dom';
 import moment       from 'moment';
+import numeral      from 'numeral';
+
+function formatCurrency(number) {
+  let currency = numeral(number).format('$0,0.00');
+  return currency;
+}
 
 class TransactionRow extends React.Component {
+  
   render() {
     const transaction = this.props.transaction
     console.log("DBG: transaction description= " + transaction.description)
     
     return (
       <tr>
-        <td> {moment(transaction.date).format("MM/DD/YYYY")} </td>
-        <td> {transaction.description}  </td>
-        <td> {transaction.amount}       </td>
+        <td className="text-left">  {transaction.date} </td>
+        <td className="text-left">  {transaction.description}  </td>
+        <td className="text-right"> {formatCurrency(transaction.amount)}       </td>
       </tr>
     )
   }
@@ -32,12 +39,12 @@ class TransactionTable extends React.Component {
     console.log("DBG: Render the transaction table")
     
     return (
-      <table>
-        <thead>
+      <table className="table table-striped table-bordered table-hover">
+        <thead className="thead-light">
           <tr>
-            <td> Created      </td>
-            <td> Description  </td>
-            <td> Amount       </td>
+            <th className="text-left">  Created      </th>
+            <th className="text-left">  Description  </th>
+            <th className="text-right"> Amount       </th>
           </tr>
         </thead>
         <tbody>{rows}</tbody>
@@ -68,9 +75,9 @@ class Ledger extends React.Component {
 //   TO THINK ABOUT HOW I SHOULD HANDLE THEM. WOULD I CONVERT TO DATE OBJECTS
 //   AND THEN FORMAT AS STRINGS?
 //-----------------------------------------------------------------------------
-const monday    = moment(new Date(2018, 0, 15)).format("MM/DD/YYYY")
-const tuesday   = moment(new Date(2018, 0, 16)).format("MM/DD/YYYY")
-const wednesday = moment(new Date(2018, 0, 17)).format("MM/DD/YYYY")
+const monday    = moment("2018-01-15").format("MM/DD/YYYY")
+const tuesday   = moment("2018-01-16").format("MM/DD/YYYY")
+const wednesday = moment("2018-01-17").format("MM/DD/YYYY")
 
 const TRANSACTIONS = [
   { description: "EWS",     date: monday,     amount:  500.00 },

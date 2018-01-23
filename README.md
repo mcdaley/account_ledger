@@ -20,6 +20,7 @@
   b.) Using Bootstrap Gem, rails, and reactjs
   c.) Using Bootstrap npm package
   d.) Using PostCSS and reactjs component structure
+  
 ## Original
 This README would normally document whatever steps are necessary to get the
 application up and running.
