@@ -55,6 +55,19 @@ class TransactionTable extends React.Component {
 
 class Ledger extends React.Component {
   
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      transactions: this.props.transactions,
+    };
+  }
+  
+  /////////////////////////////////////////////////////////////////////////////
+  // TODO: 1/22/2018
+  // - Need to figure out why I can't add more methods to the ES6 objects, I
+  //   always get an error if I call logger
+  /////////////////////////////////////////////////////////////////////////////
   logger(tnx) {
     console.log("DBG: Entered transaction logger")
   }
@@ -63,7 +76,7 @@ class Ledger extends React.Component {
     return (
       <div>
         <h1>Account Ledger</h1>
-        <TransactionTable records={this.props.transactions} />
+        <TransactionTable records={this.state.transactions} />
       </div>
     )
   }
