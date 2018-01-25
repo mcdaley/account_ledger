@@ -18,11 +18,160 @@ function formatCurrency(number) {
   return  currency;
 }
 
+//-----------------------------------------------------------------------------
+// AddTransaction
+//-----------------------------------------------------------------------------
+class AddTransaction extends React.Component {
+  constructor(props) {
+    super(props)
+    
+    this.state = {
+      date:         '',
+      description:  '',
+      amount:       '',
+    }
+    
+    
+    this.handleDate         = this.handleDate.bind(this)
+    this.handleDescription  = this.handleDescription.bind(this)
+    this.handleAmount       = this.handleAmount.bind(this)
+    this.handleSubmit       = this.handleSubmit.bind(this)
+    this.resetInitialState  = this.resetInitialState.bind(this)
+  }
+  
+  resetInitialState() {
+    console.log("INFO: Entered resetInitialState()")
+    this.setState({
+      date:         '',
+      description:  '',
+      amount:       '',
+    })
+  }
+  
+  handleDate(e) {
+    this.setState({
+      date: e.target.value
+    })
+  }
+  
+  handleDescription(e) {
+    this.setState({
+      description: e.target.value
+    })
+  }
+  
+  handleAmount(e) {
+    this.setState({
+      amount: e.target.value
+    })
+  }
+  
+  handleSubmit(e) {
+    console.log("INFO: Entered handleSubmit")
+    e.preventDefault()
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // TODO: 01/25/2018
+    // - NEED TO CHECK IF THE LOGIC THAT I'VE ADDED FOR THE CSRF CHECK IS 
+    //   REQUIRED IN THE HEADER AND BODY AS I TURNED OFF THE CHECK IN THE
+    //   ApplicationController CLASS. 
+    //
+    // - NEED TO BETTER UNDERSTAND THE CORS HEADERS STUFF IN ORDER TO HANDLE
+    //   THE CROSS-DOMAIN API CALLS, AS ALL APIS SHOULD NOT WORRY ABOUT THEM
+    ///////////////////////////////////////////////////////////////////////////
+    const url             = "/transactions"
+    
+    let   newTransaction  = {
+      date:         this.state.date,
+      description:  this.state.description,
+      amount:       this.state.amount,
+    }
+    let   csrf_token      = document.querySelector('meta[name="csrf-token"]').content
+    let   headers         = { 'Content-Type':  'application/json',
+                              'X-CSRF-Token':  csrf_token }
+    
+    let   fetchData       = {
+      method:       'POST',
+      body:         JSON.stringify({ transaction: newTransaction }),
+      headers:      headers,
+      mode:         'cors'
+    }
+    
+    //
+    // The props are not visible in the fetch block, so I need to assign it to 
+    // a variable in order to get it to work, not sure I understand the scoping
+    // of fetch.
+    //
+    let   addTransactionPtr     = this.props.addTransaction
+    let   resetInitialStatePtr  = this.resetInitialState
+    
+    fetch(url, fetchData)
+      .then(function(response) {
+        return response.json()
+      })
+      .then(function(data) {
+        console.log("INFO: Successfully added transaction")
+        addTransactionPtr(data)
+        resetInitialStatePtr()
+      })
+      .catch(err => console.error('ERROR:', err))
+      
+      // Reset the form
+      //this.resetInitialState()
+  }
+  
+  render() {
+    console.log("DEBUG: Entered render for add transaction form")
+    return (
+      <div className="card bg-info" style={{marginBottom: 0.50 + "rem"}}>
+        <form className="card-body" style={{paddingTop: 0.50 + "rem", paddingBottom: 0 + "rem"}}>
+          <div className="form-row">
+            <div className="col-3">
+              <label  className   ="sr-only">Date</label>
+              <input  type        = "date" 
+                      onChange    = {this.handleDate} 
+                      className   = "form-control" 
+                      placeholder = "Date" 
+                      value       = {this.state.date} ></input>
+            </div>
+            <div className="col-6">
+              <label className    = "sr-only">Description</label>
+              <input  type        = "text" 
+                      onChange    = {this.handleDescription} 
+                      className   = "form-control" 
+                      id          = "txnDescription" 
+                      placeholder = "Description" 
+                      value       = {this.state.description} ></input>
+            </div>
+            <div className="col-2">
+              <label className    = "sr-only">Amount</label>
+              <input  type        = "text" 
+                      onChange    = {this.handleAmount} 
+                      className   = "form-control" 
+                      id          = "txnAmount" 
+                      placeholder = "Amount" 
+                      value       = {this.state.amount} ></input>
+            </div>
+            <div className="col-1">
+              <button type        = "submit" 
+                      onClick     = {this.handleSubmit} 
+                      className   = "btn btn-primary mb-2">Add</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    )
+  }
+}
+
+//-----------------------------------------------------------------------------
+// TransactionRow
+//-----------------------------------------------------------------------------
 class TransactionRow extends React.Component {
   
   render() {
     const transaction = this.props.transaction
-    console.log("DBG: transaction description= " + transaction.description)
+    //** console.log("DBG: transaction description= " + transaction.description)
     
     return (
       <tr>
@@ -34,13 +183,15 @@ class TransactionRow extends React.Component {
   }
 }
 
+//-----------------------------------------------------------------------------
+// TransactionTable
+//-----------------------------------------------------------------------------
 class TransactionTable extends React.Component {
   render() {
     let rows = []
-    let i    = 0
     this.props.records.forEach((transaction) => {
       rows.push(
-        <TransactionRow transaction={transaction} key={i++}/>
+        <TransactionRow key={transaction.id} transaction={transaction} />
       )
     });
     console.log("DBG: Render the transaction table")
@@ -60,6 +211,9 @@ class TransactionTable extends React.Component {
   }
 }
 
+//-----------------------------------------------------------------------------
+// Ledger
+//-----------------------------------------------------------------------------
 class Ledger extends React.Component {
   
   constructor(props) {
@@ -68,6 +222,17 @@ class Ledger extends React.Component {
     this.state = {
       transactions: this.props.transactions,
     };
+    
+    this.addTransaction     = this.addTransaction.bind(this)
+  }
+  
+  addTransaction(newTransaction) {
+    console.log(`INFO: add new transaction, date: ${newTransaction.date}, description: ${newTransaction.description}, amount: ${newTransaction.amount}`)
+    
+    this.setState({
+      transactions: this.state.transactions.concat([newTransaction])
+    })
+    return
   }
   
 /******************************************************************** 
@@ -87,13 +252,6 @@ class Ledger extends React.Component {
   }
 *********************************************************************/
   
-  /////////////////////////////////////////////////////////////////////////////
-  // TODO: 1/22/2018
-  // - Need to figure out why I can't add more methods to the ES6 objects, I
-  //   always get an error if I call logger
-  //
-  // - Need to preface the API calls with this.logger(txn)
-  /////////////////////////////////////////////////////////////////////////////
   logger(tnx) {
     console.log("DBG: Entered transaction logger")
   }
@@ -101,7 +259,8 @@ class Ledger extends React.Component {
   render() {    
     return (
       <div>
-        <h1>Account Ledger</h1>
+        <h2>Account Ledger</h2>
+        <AddTransaction addTransaction={this.addTransaction} />
         <TransactionTable records={this.state.transactions} />
       </div>
     )
@@ -127,6 +286,9 @@ class Ledger extends React.Component {
   ]
 *********************************************************************/
 
+/*
+ * Load the transactions from the data-transactions attribute
+ */
 document.addEventListener('DOMContentLoaded', () => {
   let ledger        = document.getElementById('ledger')
   let transactions  = JSON.parse(ledger.dataset.transactions)

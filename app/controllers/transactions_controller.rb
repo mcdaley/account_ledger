@@ -16,5 +16,27 @@ class TransactionsController < ApplicationController
     @transactions       = Transaction.order(date: :desc)
     @transactions_json  = @transactions.to_json
   end
+  
+  def create
+    logger.debug "DEBUG: Create transaction params=[#{params.inspect}]"
+    logger.debug "DEBUG: params[transaction]= #{params["transaction"].inspect}"
+    @transaction = Transaction.new(transaction_params)
+    
+    if @transaction.save
+      @transaction_json = @transaction.to_json
+      logger.debug "DEBUG: Added transaction: #{@transaction_json}"
+      render json: @transaction_json
+    else
+      render json: @transaction.errors, status: :unprocessable_entity
+    end
+  end
+  
+  #----------------------------------------------------------------------------
+  # private
+  #----------------------------------------------------------------------------
+  private
+    def transaction_params
+      params.require(:transaction).permit(:date, :description, :amount)
+    end
 
 end # end of class TransactionsController
