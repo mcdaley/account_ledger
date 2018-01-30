@@ -18,17 +18,35 @@ class TransactionsController < ApplicationController
   end
   
   def create
-    logger.debug "DEBUG: Create transaction params=[#{params.inspect}]"
-    logger.debug "DEBUG: params[transaction]= #{params["transaction"].inspect}"
     @transaction = Transaction.new(transaction_params)
     
     if @transaction.save
       @transaction_json = @transaction.to_json
-      logger.debug "DEBUG: Added transaction: #{@transaction_json}"
       render json: @transaction_json
     else
       render json: @transaction.errors, status: :unprocessable_entity
     end
+  end
+  
+  ##
+  # Update a transaction and return the updated transaction, otherwise
+  # return the json error
+  #
+  def update
+    logger.debug "DEBUG: Update params-[#{params.inspect}]"
+    ## logger.debug "DEBUG: Update params[:id]   = #{params[:id]}"
+    ##logger.debug "DEBUG: Update params[:data] = #{params[:transaction]}"
+    
+    @transaction = Transaction.find(params[:id])
+    logger.debug "DEBUG: Update the transaction: #{@transaction.inspect}"
+#=begin
+    if @transaction.update(transaction_params)
+      @transaction_json = @transaction.to_json
+      render json: @transaction_json
+    else
+      render json: @record.errors, status: :unprocessable_entity
+    end
+#=end
   end
   
   #----------------------------------------------------------------------------
