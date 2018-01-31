@@ -17,6 +17,13 @@ class TransactionsController < ApplicationController
     @transactions_json  = @transactions.to_json
   end
   
+  #############################################################################
+  # TODO: 01/30/2018
+  # - WHEN I CREATE THE API VERSIONS OF THE CONTROLLERS, I NEED TO ADD A
+  #   HEADER/META SECTION AND A BODY TO THE RESPONSES FOR CREATE, READ, 
+  #   UPDATE, AND DELETE OPERATIONS, SO THAT I CAN TEST FOR SUCCESS AND SEND
+  #   AN APPROPRIATE ERROR MESSAGE IF SOMETHING GOES WRONG.
+  #############################################################################
   def create
     @transaction = Transaction.new(transaction_params)
     
@@ -34,19 +41,22 @@ class TransactionsController < ApplicationController
   #
   def update
     logger.debug "DEBUG: Update params-[#{params.inspect}]"
-    ## logger.debug "DEBUG: Update params[:id]   = #{params[:id]}"
-    ##logger.debug "DEBUG: Update params[:data] = #{params[:transaction]}"
     
     @transaction = Transaction.find(params[:id])
-    logger.debug "DEBUG: Update the transaction: #{@transaction.inspect}"
-#=begin
+    
     if @transaction.update(transaction_params)
       @transaction_json = @transaction.to_json
       render json: @transaction_json
     else
       render json: @record.errors, status: :unprocessable_entity
     end
-#=end
+  end
+  
+  def destroy
+    @transaction = Transaction.find(params[:id])
+    @transaction.destroy
+    
+    render json: @transaction
   end
   
   #----------------------------------------------------------------------------

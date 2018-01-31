@@ -300,9 +300,40 @@ class TransactionRow extends React.Component {
     this.toggleEdit()
   }
   
+  /****
+   * Call DELTE /transactions/:id to delete the transaction from the ledger 
+   * then call the Ledger.deleteTransaction callback property
+   */
   handleDelete(e) {  
     console.log("DEBUG: Delete the transaction")
     e.preventDefault()
+    
+    console.log("DEBUG: Prepare to delete the transaction") 
+    const url = `/transactions/${this.state.transaction.id}`
+        
+    let   csrf_token      = document.querySelector('meta[name="csrf-token"]').content
+    let   headers         = { 'Content-Type':  'application/json',
+                              'X-CSRF-Token':  csrf_token }
+    
+    let   fetchData       = {
+      method:       'DELETE',
+      body:         '',
+      headers:      headers,
+      mode:         'cors'
+    }
+
+    let   deleteTransactionPtr  = this.props.deleteTransaction // Callback from Ledger
+    let   transaction_id        = this.state.transaction.id
+  
+    fetch(url, fetchData)
+      .then(function(response) {
+        return response.json()
+      })
+      .then(function(transaction) {
+        console.log(`INFO: Successfully deleted transaction with id= ${transaction_id}`)
+        deleteTransactionPtr(transaction)
+      })
+      .catch(err => console.error('ERROR:', err.message))
   }
   
   /****
@@ -407,7 +438,8 @@ class TransactionTable extends React.Component {
       rows.push(
         <TransactionRow key               = {transaction.id} 
                         transaction       = {transaction} 
-                        updateTransaction = {this.props.updateTransaction} />
+                        updateTransaction = {this.props.updateTransaction}
+                        deleteTransaction = {this.props.deleteTransaction} />
       )
     });
     console.log("DBG: Render the transaction table")
@@ -442,6 +474,7 @@ class Ledger extends React.Component {
     
     this.addTransaction     = this.addTransaction.bind(this)
     this.updateTransaction  = this.updateTransaction.bind(this)
+    this.deleteTransaction  = this.deleteTransaction.bind(this)
   }
   
   addTransaction(newTransaction) {
@@ -466,10 +499,26 @@ class Ledger extends React.Component {
     
     this.setState({
       transactions: txns,
+    })   
+    return
+  }
+  
+  /*****
+   * Remove the deleted transaction from the transactions state array and
+   * render the updated view.
+   */
+  deleteTransaction(transaction) {
+    console.log(`INFO: Remove transaction with id= ${transaction} from Ledger view`)
+    
+    /**************
+      let deleted_txn   = _.remove(this.state.transactions, (element) => { return element.id == transaction.id } )
+      let txns          = _.cloneDeep(this.state.transactions)
+    ***************/
+    let txns = this.state.transactions.filter( (element) => element.id != transaction.id)
+    
+    this.setState({
+      transactions: txns,
     })
-          
-    console.log(`INFO: Found index= ${index}`)
-    // Need to clone the array and replace the updated transaction, use lodash
     return
   }
   
@@ -500,7 +549,8 @@ class Ledger extends React.Component {
         <h2>Account Ledger</h2>
         <AddTransaction   addTransaction    = {this.addTransaction} />
         <TransactionTable records           = {this.state.transactions} 
-                          updateTransaction = {this.updateTransaction} />
+                          updateTransaction = {this.updateTransaction}
+                          deleteTransaction = {this.deleteTransaction} />
       </div>
     )
   }
