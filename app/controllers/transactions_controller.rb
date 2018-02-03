@@ -17,21 +17,43 @@ class TransactionsController < ApplicationController
     @transactions_json  = @transactions.to_json
   end
   
-  #############################################################################
-  # TODO: 01/30/2018
-  # - WHEN I CREATE THE API VERSIONS OF THE CONTROLLERS, I NEED TO ADD A
-  #   HEADER/META SECTION AND A BODY TO THE RESPONSES FOR CREATE, READ, 
-  #   UPDATE, AND DELETE OPERATIONS, SO THAT I CAN TEST FOR SUCCESS AND SEND
-  #   AN APPROPRIATE ERROR MESSAGE IF SOMETHING GOES WRONG.
-  #############################################################################
+  ##
+  # Create a new transaction and return API response
+  #
   def create
     @transaction = Transaction.new(transaction_params)
     
     if @transaction.save
-      @transaction_json = @transaction.to_json
-      render json: @transaction_json
+      respond_to do |format|
+        format.json {
+          transaction_response = {
+            header: {
+              code:   200,
+              status: "OK",
+              msg:    "Created transaction with id=[#{@transaction.id}]"
+            },
+            body: {
+              transaction: @transaction
+            }
+          }
+          render json: transaction_response
+        }
+      end
     else
-      render json: @transaction.errors, status: :unprocessable_entity
+      respond_to do |format|
+        format.json {
+          transaction_error_response = {
+            header: {
+              code:   422,
+              status: "ERROR",
+              msg:    "Failed to create transaction",
+              errors: @transaction.errors
+            },
+            body: {}  
+          }
+          render json: transaction_error_response, status: :unprocessable_entity
+        }
+      end
     end
   end
   
@@ -45,10 +67,40 @@ class TransactionsController < ApplicationController
     @transaction = Transaction.find(params[:id])
     
     if @transaction.update(transaction_params)
-      @transaction_json = @transaction.to_json
-      render json: @transaction_json
+      logger.debug("DEBUG: Successfully updated transaction with id=[#{@transaction.id}]")
+      respond_to do |format|
+        format.json {
+          transaction_response = {
+            header: {
+              code:   200,
+              status: "OK",
+              msg:    "Updated transaction with id=[#{@transaction.id}]"
+            },
+            body: {
+              transaction: @transaction
+            }
+          }
+          logger.debug("MIKE: Transaction response= #{transaction_response.inspect}")
+          render json: transaction_response
+        }
+      end      
     else
-      render json: @record.errors, status: :unprocessable_entity
+      logger.log_error_messages(@transaction, "TRANSACTIONS")
+      respond_to do |format|
+        format.json {
+          transaction_error_response = {
+            header: {
+              code:   422,
+              status: "ERROR",
+              msg:    "Failed to update the transaction with id=[#{@transaction.id}]",
+              errors: @transaction.errors
+            },
+            body: {}  
+          }
+          logger.debug("MIKE: Transaction error response= #{transaction_error_response.inspect}")
+          render json: transaction_error_response, status: :unprocessable_entity
+        }
+      end
     end
   end
   

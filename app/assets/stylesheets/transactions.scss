@@ -1,3 +1,16 @@
-// Place all the styles related to the Transactions controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+/******************************************************************************
+ * app/assets/transactions.scss
+ ******************************************************************************/
+
+@import "global_styles";
+
+.has-error {
+  color:                    $state-danger-text;
+  border:                   1px solid $state-danger-text;
+  background-color:         $state-danger-bg;
+}
+
+.error-text {
+  color:                    $state-danger-text;
+  font-size:                0.90rem;
+}

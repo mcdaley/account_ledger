@@ -35,6 +35,7 @@ class AddTransaction extends React.Component {
       date:         '',
       description:  '',
       amount:       '',
+      errors:       {},
     }
     
     this.handleDate         = this.handleDate.bind(this)
@@ -42,6 +43,9 @@ class AddTransaction extends React.Component {
     this.handleAmount       = this.handleAmount.bind(this)
     this.handleSubmit       = this.handleSubmit.bind(this)
     this.resetInitialState  = this.resetInitialState.bind(this)
+    this.hasError           = this.hasError.bind(this)
+    this.showErrorMessage   = this.showErrorMessage.bind(this)
+    this.updateErrors       = this.updateErrors.bind(this)
   }
   
   resetInitialState() {
@@ -50,8 +54,32 @@ class AddTransaction extends React.Component {
       date:         '',
       description:  '',
       amount:       '',
+      errors:       {},
     })
   }
+  
+  hasError(name) {
+    if(this.state.errors.hasOwnProperty(name) ) {
+      return true;
+    }
+    return false;
+  }
+  
+  showErrorMessage(name) {
+    if(this.hasError(name)) {
+      return (
+        <span className="error-text">
+          {this.state.errors[name][0]}
+        </span>
+      )
+    }
+  }
+  
+  updateErrors(data) {
+    this.setState({
+      errors: data.header.errors
+    })
+  } 
   
   handleDate(e) {
     this.setState({
@@ -109,15 +137,23 @@ class AddTransaction extends React.Component {
     //
     let   addTransactionPtr     = this.props.addTransaction
     let   resetInitialStatePtr  = this.resetInitialState
+    let   updateErrorsPtr       = this.updateErrors
     
     fetch(url, fetchData)
       .then(function(response) {
         return response.json()
       })
       .then(function(data) {
-        console.log("INFO: Successfully added transaction")
-        addTransactionPtr(data)
-        resetInitialStatePtr()
+        if(data.header.code == 200) {
+          console.log("INFO: Successfully added transaction")
+          addTransactionPtr(data.body.transaction)
+          resetInitialStatePtr()
+        }
+        else {
+          // Response returned error
+          console.log("ERROR: Failed to create the transaction")
+          updateErrorsPtr(data)
+        }   
       })
       .catch(err => console.error('ERROR:', err))      
   }
@@ -132,27 +168,34 @@ class AddTransaction extends React.Component {
               <label  className   ="sr-only">Date</label>
               <input  type        = "date" 
                       onChange    = {this.handleDate} 
-                      className   = "form-control" 
+                      className   = { this.hasError('date') ? "form-control has-error" : "form-control" }
                       placeholder = "Date" 
-                      value       = {this.state.date} ></input>
+                      value       = {this.state.date} 
+                      autoFocus >
+              </input>
+              { this.showErrorMessage('date') }
             </div>
             <div className="col-6">
               <label className    = "sr-only">Description</label>
               <input  type        = "text" 
                       onChange    = {this.handleDescription} 
-                      className   = "form-control" 
+                      className   = { this.hasError('description') ? "form-control has-error" : "form-control" }
                       id          = "txnDescription" 
                       placeholder = "Description" 
-                      value       = {this.state.description} ></input>
+                      value       = {this.state.description} >
+              </input>
+              { this.showErrorMessage('description') }
             </div>
             <div className="col-2">
               <label className    = "sr-only">Amount</label>
               <input  type        = "text" 
                       onChange    = {this.handleAmount} 
-                      className   = "form-control" 
+                      className   = { this.hasError('amount') ? "form-control has-error" : "form-control" }
                       id          = "txnAmount" 
                       placeholder = "Amount" 
-                      value       = {this.state.amount} ></input>
+                      value       = {this.state.amount} >
+              </input>
+              { this.showErrorMessage('amount') }
             </div>
             <div className="col-1">
               <button type        = "submit" 
@@ -163,21 +206,6 @@ class AddTransaction extends React.Component {
         </form>
       </div>
     )
-  }
-}
-
-//-----------------------------------------------------------------------------
-// UpdateTransaction
-//-----------------------------------------------------------------------------
-class UpdateTransaction extends React.Component {
-  constructor(props) {
-    super(props)
-    
-    this.state = {
-      date:         this.props.date,
-      description:  this.props.description,
-      amount:       this.props.amount,
-    }
   }
 }
 
@@ -196,6 +224,7 @@ class TransactionRow extends React.Component {
     ///////////////////////////////////////////////////////////////////////////
     this.state = {
       edit:         false,
+      errors:       {},
       transaction:  this.props.transaction,                       // Duplicated
     }
     
@@ -203,15 +232,33 @@ class TransactionRow extends React.Component {
     this.handleDescription  = this.handleDescription.bind(this)   // Duplicated
     this.handleAmount       = this.handleAmount.bind(this)        // Duplicated
     this.handleEdit         = this.handleEdit.bind(this)
+    this.toggleEdit         = this.toggleEdit.bind(this)
     this.handleUpdate       = this.handleUpdate.bind(this)
     this.handleCancel       = this.handleCancel.bind(this)
     this.handleDelete       = this.handleDelete.bind(this)
+    this.updateErrors       = this.updateErrors.bind(this)
+    this.hasError           = this.hasError.bind(this)
+    this.resetInitialState  = this.resetInitialState.bind(this)
+    this.showErrorMessage   = this.showErrorMessage.bind(this)
   }
   
   toggleEdit() {  
     this.setState(prevState => ({
       edit: !prevState.edit
     }))
+  }
+  
+  resetInitialState() {
+    this.setState(prevState => ({
+      transaction:  this.props.transaction,
+      errors:       {}
+    }))
+  }
+  
+  updateErrors(data) {
+    this.setState({
+      errors: data.header.errors
+    })
   }
   
   handleEdit(e) {
@@ -277,27 +324,52 @@ class TransactionRow extends React.Component {
     // The props are not visible in the fetch block, so I need to assign it to 
     // a variable in order to get it to work, not sure I understand the scoping
     // of fetch.
-    //
-    let   updateTransactionPtr     = this.props.updateTransaction // Callback from Ledger
-    //** Does the component unmount at this point, should figure out the state
-    //** let   resetInitialStatePtr  = this.resetInitialState
-    this.toggleEdit()
+    //    
+    let   updateTransactionPtr    = this.props.updateTransaction // Callback from Ledger
+    let   toggleEditPtr           = this.toggleEdit
+    let   updateErrorsPtr         = this.updateErrors
     
     fetch(url, fetchData)
       .then(function(response) {
         return response.json()
       })
-      .then(function(transaction) {
+      .then(function(data) {
         console.log("INFO: Successfully updated transaction")
-        updateTransactionPtr(transaction)
-        //** resetInitialStatePtr()
+        if(data.header.code == 200) {
+          toggleEditPtr()
+          updateTransactionPtr(data.body.transaction)
+        }
+        else {          
+          // Response returned error
+          updateErrorsPtr(data)
+        }        
       })
-      .catch(err => console.error('ERROR:', err.message))            
+      .catch(function(err) {
+        console.error('ERROR: ', err.message)
+      })
+  }
+  
+  hasError(name) {
+    if(this.state.errors.hasOwnProperty(name) ) {
+      return true;
+    }
+    return false;
+  }
+  
+  showErrorMessage(name) {
+    if(this.hasError(name)) {
+      return (
+        <span className="error-text">
+          {this.state.errors[name][0]}
+        </span>
+      )
+    }
   }
   
   handleCancel(e) {
     e.preventDefault()
     this.toggleEdit()
+    this.resetInitialState()
   }
   
   /****
@@ -377,29 +449,36 @@ class TransactionRow extends React.Component {
             <div className="form-row">
               <div className="col-3">
                 <label  className   ="sr-only">Date</label>
-                <input  type        = "date" 
+                <input  type        = "date"
                         onChange    = {this.handleDate} 
-                        className   = "form-control" 
+                        className   = { this.hasError('date') ? "form-control has-error" : "form-control" }
                         placeholder = "Date" 
-                        value       = {transaction.date} ></input>
+                        value       = {transaction.date}
+                        autoFocus >
+                </input>
+                { this.showErrorMessage('date') }
               </div>
               <div className="col-4">
-                <label className    = "sr-only">Description</label>
+                <label  className   = "sr-only">Description</label>
                 <input  type        = "text" 
                         onChange    = {this.handleDescription} 
-                        className   = "form-control" 
+                        className   = { this.hasError('description') ? "form-control has-error" : "form-control" }
                         id          = "txnDescription" 
                         placeholder = "Description" 
-                        value       = {transaction.description} ></input>
+                        value       = {transaction.description} >
+                </input>
+                { this.showErrorMessage('description') }        
               </div>
               <div className="col-2">
                 <label className    = "sr-only">Amount</label>
                 <input  type        = "text" 
                         onChange    = {this.handleAmount} 
-                        className   = "form-control" 
+                        className   = { this.hasError('amount') ? "form-control has-error" : "form-control" }
                         id          = "txnAmount" 
                         placeholder = "Amount" 
-                        value       = {transaction.amount} ></input>
+                        value       = {transaction.amount} >
+                </input>
+                { this.showErrorMessage('amount') } 
               </div>
               <div className="col-3">
                 <span>
