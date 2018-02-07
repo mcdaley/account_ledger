@@ -1,0 +1,190 @@
+//-----------------------------------------------------------------------------
+// app/javascript/components/add_transaction/add_transaction.js
+//-----------------------------------------------------------------------------
+import React        from 'react';
+import ReactDOM     from 'react-dom';
+
+//-----------------------------------------------------------------------------
+// AddTransaction
+//-----------------------------------------------------------------------------
+export default class AddTransaction extends React.Component {
+  constructor(props) {
+    super(props)
+    
+    this.state = {
+      date:         '',
+      description:  '',
+      amount:       '',
+      errors:       {},
+    }
+    
+    this.handleDate         = this.handleDate.bind(this)
+    this.handleDescription  = this.handleDescription.bind(this)
+    this.handleAmount       = this.handleAmount.bind(this)
+    this.handleSubmit       = this.handleSubmit.bind(this)
+    this.resetInitialState  = this.resetInitialState.bind(this)
+    this.hasError           = this.hasError.bind(this)
+    this.showErrorMessage   = this.showErrorMessage.bind(this)
+    this.updateErrors       = this.updateErrors.bind(this)
+  }
+  
+  resetInitialState() {
+    console.log("INFO: Entered resetInitialState()")
+    this.setState({
+      date:         '',
+      description:  '',
+      amount:       '',
+      errors:       {},
+    })
+  }
+  
+  hasError(name) {
+    if(this.state.errors.hasOwnProperty(name) ) {
+      return true;
+    }
+    return false;
+  }
+  
+  showErrorMessage(name) {
+    if(this.hasError(name)) {
+      return (
+        <span className="error-text">
+          {this.state.errors[name][0]}
+        </span>
+      )
+    }
+  }
+  
+  updateErrors(data) {
+    this.setState({
+      errors: data.header.errors
+    })
+  } 
+  
+  handleDate(e) {
+    this.setState({
+      date: e.target.value
+    })
+  }
+  
+  handleDescription(e) {
+    this.setState({
+      description: e.target.value
+    })
+  }
+  
+  handleAmount(e) {
+    this.setState({
+      amount: e.target.value
+    })
+  }
+  
+  handleSubmit(e) {
+    console.log("INFO: Entered handleSubmit")
+    e.preventDefault()
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // TODO: 01/25/2018
+    // - NEED TO CHECK IF THE LOGIC THAT I'VE ADDED FOR THE CSRF CHECK IS 
+    //   REQUIRED IN THE HEADER AND BODY AS I TURNED OFF THE CHECK IN THE
+    //   ApplicationController CLASS. 
+    //
+    // - NEED TO BETTER UNDERSTAND THE CORS HEADERS STUFF IN ORDER TO HANDLE
+    //   THE CROSS-DOMAIN API CALLS, AS ALL APIS SHOULD NOT WORRY ABOUT THEM
+    ///////////////////////////////////////////////////////////////////////////
+    const url             = "/transactions"
+    
+    let   newTransaction  = {
+      date:         this.state.date,
+      description:  this.state.description,
+      amount:       this.state.amount,
+    }
+    let   csrf_token      = document.querySelector('meta[name="csrf-token"]').content
+    let   headers         = { 'Content-Type':  'application/json',
+                              'X-CSRF-Token':  csrf_token }
+    
+    let   fetchData       = {
+      method:       'POST',
+      body:         JSON.stringify({ transaction: newTransaction }),
+      headers:      headers,
+      mode:         'cors'
+    }
+    
+    //
+    // The props are not visible in the fetch block, so I need to assign it to 
+    // a variable in order to get it to work, not sure I understand the scoping
+    // of fetch.
+    //
+    let   addTransactionPtr     = this.props.addTransaction
+    let   resetInitialStatePtr  = this.resetInitialState
+    let   updateErrorsPtr       = this.updateErrors
+    
+    fetch(url, fetchData)
+      .then(function(response) {
+        return response.json()
+      })
+      .then(function(data) {
+        if(data.header.code == 200) {
+          console.log("INFO: Successfully added transaction")
+          addTransactionPtr(data.body.transaction)
+          resetInitialStatePtr()
+        }
+        else {
+          // Response returned error
+          console.log("ERROR: Failed to create the transaction")
+          updateErrorsPtr(data)
+        }   
+      })
+      .catch(err => console.error('ERROR:', err))      
+  }
+  
+  render() {
+    console.log("DEBUG: Entered render for add transaction form")
+    return (
+      <div className="card bg-info" style={{marginBottom: 0.50 + "rem"}}>
+        <form className="card-body" style={{paddingTop: 0.50 + "rem", paddingBottom: 0 + "rem"}}>
+          <div className="form-row">
+            <div className="col-3">
+              <label  className   ="sr-only">Date</label>
+              <input  type        = "date" 
+                      onChange    = {this.handleDate} 
+                      className   = { this.hasError('date') ? "form-control has-error" : "form-control" }
+                      placeholder = "Date" 
+                      value       = {this.state.date} 
+                      autoFocus >
+              </input>
+              { this.showErrorMessage('date') }
+            </div>
+            <div className="col-6">
+              <label className    = "sr-only">Description</label>
+              <input  type        = "text" 
+                      onChange    = {this.handleDescription} 
+                      className   = { this.hasError('description') ? "form-control has-error" : "form-control" }
+                      id          = "txnDescription" 
+                      placeholder = "Description" 
+                      value       = {this.state.description} >
+              </input>
+              { this.showErrorMessage('description') }
+            </div>
+            <div className="col-2">
+              <label className    = "sr-only">Amount</label>
+              <input  type        = "text" 
+                      onChange    = {this.handleAmount} 
+                      className   = { this.hasError('amount') ? "form-control has-error" : "form-control" }
+                      id          = "txnAmount" 
+                      placeholder = "Amount" 
+                      value       = {this.state.amount} >
+              </input>
+              { this.showErrorMessage('amount') }
+            </div>
+            <div className="col-1">
+              <button type        = "submit" 
+                      onClick     = {this.handleSubmit} 
+                      className   = "btn btn-primary mb-2">Add</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    )
+  }
+}
