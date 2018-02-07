@@ -26,6 +26,7 @@ class TransactionsController < ApplicationController
     if @transaction.save
       respond_to do |format|
         format.json {
+          # Build the success API response
           transaction_response = {
             header: {
               code:   200,
@@ -42,6 +43,7 @@ class TransactionsController < ApplicationController
     else
       respond_to do |format|
         format.json {
+          # Build the error API response
           transaction_error_response = {
             header: {
               code:   422,
@@ -70,6 +72,7 @@ class TransactionsController < ApplicationController
       logger.debug("DEBUG: Successfully updated transaction with id=[#{@transaction.id}]")
       respond_to do |format|
         format.json {
+          # Build the success API response
           transaction_response = {
             header: {
               code:   200,
@@ -88,6 +91,7 @@ class TransactionsController < ApplicationController
       logger.log_error_messages(@transaction, "TRANSACTIONS")
       respond_to do |format|
         format.json {
+          # Build the error API response
           transaction_error_response = {
             header: {
               code:   422,
