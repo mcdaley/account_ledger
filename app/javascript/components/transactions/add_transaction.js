@@ -22,6 +22,7 @@ export default class AddTransaction extends React.Component {
     this.handleDescription  = this.handleDescription.bind(this)
     this.handleAmount       = this.handleAmount.bind(this)
     this.handleSubmit       = this.handleSubmit.bind(this)
+    this.handleClear        = this.handleClear.bind(this)
     this.resetInitialState  = this.resetInitialState.bind(this)
     this.hasError           = this.hasError.bind(this)
     this.showErrorMessage   = this.showErrorMessage.bind(this)
@@ -77,6 +78,10 @@ export default class AddTransaction extends React.Component {
     this.setState({
       amount: e.target.value
     })
+  }
+  
+  handleClear(e) {
+    this.resetInitialState()
   }
   
   handleSubmit(e) {
@@ -155,7 +160,7 @@ export default class AddTransaction extends React.Component {
               </input>
               { this.showErrorMessage('date') }
             </div>
-            <div className="col-6">
+            <div className="col-5">
               <label className    = "sr-only">Description</label>
               <input  type        = "text" 
                       onChange    = {this.handleDescription} 
@@ -177,10 +182,16 @@ export default class AddTransaction extends React.Component {
               </input>
               { this.showErrorMessage('amount') }
             </div>
-            <div className="col-1">
+            <div className="col-2">
               <button type        = "submit" 
                       onClick     = {this.handleSubmit} 
-                      className   = "btn btn-primary mb-2">Add</button>
+                      className   = "btn btn-primary mb-2"> Add
+              </button>
+              <button type        = "submit" 
+                      onClick     = {this.handleClear} 
+                      className   = "btn mb-2"
+                      style       = {{marginLeft: 0.25 + "rem"}}> Clear
+              </button>
             </div>
           </div>
         </form>
