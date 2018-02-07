@@ -248,8 +248,7 @@ export default class TransactionRow extends React.Component {
                 <label  className   ="sr-only">Date</label>
                 <input  type        = "date"
                         onChange    = {this.handleDate} 
-                        className   = { this.hasError('date') ? "form-control has-error" : "form-control" }
-                        placeholder = "Date" 
+                        className   = { this.hasError('date') ? "form-control has-error" : "form-control" } 
                         value       = {transaction.date}
                         autoFocus >
                 </input>

@@ -154,9 +154,7 @@ export default class AddTransaction extends React.Component {
               <input  type        = "date" 
                       onChange    = {this.handleDate} 
                       className   = { this.hasError('date') ? "form-control has-error" : "form-control" }
-                      placeholder = "Date" 
-                      value       = {this.state.date} 
-                      autoFocus >
+                      value       = {this.state.date} >
               </input>
               { this.showErrorMessage('date') }
             </div>
