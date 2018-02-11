@@ -3,6 +3,8 @@
 //-----------------------------------------------------------------------------
 import React              from 'react'
 import ReactDOM           from 'react-dom'
+import moment             from 'moment'       // Move logic to utils.js and import
+import { fromJS, Map }    from 'immutable'
 import AddTransaction     from 'components/transactions/add_transaction'
 import TransactionTable   from 'components/transactions/transaction_table'
 
@@ -15,19 +17,55 @@ export default class Ledger extends React.Component {
     super(props);
     
     this.state = {
-      transactions: this.props.transactions,
+      transactions:      fromJS(this.props.transactions),
     };
     
-    this.addTransaction     = this.addTransaction.bind(this)
-    this.updateTransaction  = this.updateTransaction.bind(this)
-    this.deleteTransaction  = this.deleteTransaction.bind(this)
+    this.addTransaction       = this.addTransaction.bind(this)
+    this.updateTransaction    = this.updateTransaction.bind(this)
+    this.deleteTransaction    = this.deleteTransaction.bind(this)
+    //** this.convertTransactions  = this.convertTransactions.bind(this)
   }
   
+  /****
+   * Convert the transactions to an Immutable Map that can be used in with 
+   * the immutable.js APIs
+   * 
+   * To find a transaction, you can do:
+   * - let t = txn_list.get('75')
+   * - let d = txn_list.get('75').get('description')
+   * - let d = txn_list.get(['75', 'description'])
+   *
+   * To update a transaction
+   * - txn_list = txn_list.setIn(['75', 'description'], 'New Description')
+   *
+   * Need to figure out
+   * 1. Can I get multiple fields back in the get
+   * 2. Can I set multiple fields using setIn
+   */
+/************************************************
+  /////////////////////////////////////////////////////////////////////////////
+  // NOTE: 02/10/2018
+  // -  TURNED OFF THE CONVERSION OF THE TRANSACTIONS AND I'M USING A List 
+  //    INSTEAD OF A Map FOR THE CRUD OPERTATIONS.
+  /////////////////////////////////////////////////////////////////////////////
+  convertTransactions() {
+    let z = {}
+
+    this.props.transactions.forEach( (txn) => { z[txn.id] = txn } )
+    
+    const   txn_map = fromJS(z)
+    return  txn_map
+  }
+*************************************************/
+  
+  /****
+   * Add the transaction to the front of the List
+   */
   addTransaction(newTransaction) {
     console.log(`INFO: add new transaction, date: ${newTransaction.date}, description: ${newTransaction.description}, amount: ${newTransaction.amount}`)
-    
+        
     this.setState({
-      transactions: this.state.transactions.concat([newTransaction])
+      transactions: this.state.transactions.unshift( fromJS(newTransaction) )
     })
     return
   }
@@ -36,15 +74,15 @@ export default class Ledger extends React.Component {
    * Transaction was updated in DB, so update the state in transactions [] and
    * render the transactions
    */ 
-  updateTransaction(transaction) {
-    console.log("INFO: Entered Ledger.updateTransaction)")
-
-    let index   = this.state.transactions.findIndex( (element) => { return element.id == transaction.id } )
-    let txns    = _.cloneDeep(this.state.transactions)
-    txns[index] = transaction
+  updateTransaction(updatedTransaction) {
+    let transaction   = fromJS(updatedTransaction)
+    let index         = this.state.transactions.findIndex( 
+                          el => { return el.get('id') === updatedTransaction.id 
+                        })
+    let transactions  = this.state.transactions.update( index, el => { return transaction } )
     
     this.setState({
-      transactions: txns,
+      transactions: transactions,
     })   
     return
   }
@@ -53,17 +91,16 @@ export default class Ledger extends React.Component {
    * Remove the deleted transaction from the transactions state array and
    * render the updated view.
    */
-  deleteTransaction(transaction) {
-    console.log(`INFO: Remove transaction with id= ${transaction} from Ledger view`)
+  deleteTransaction(deletedTransaction) {
+    console.log(`INFO: Remove transaction with id= ${deletedTransaction} from Ledger view`)
     
-    /**************
-      let deleted_txn   = _.remove(this.state.transactions, (element) => { return element.id == transaction.id } )
-      let txns          = _.cloneDeep(this.state.transactions)
-    ***************/
-    let txns = this.state.transactions.filter( (element) => element.id != transaction.id)
+    let index         = this.state.transactions.findIndex( 
+                          el => { return el.get('id') === deletedTransaction.id 
+                        } )
+    let transactions  = this.state.transactions.delete(index)
     
     this.setState({
-      transactions: txns,
+      transactions: transactions,
     })
     return
   }
@@ -89,14 +126,30 @@ export default class Ledger extends React.Component {
     console.log("DBG: Entered transaction logger")
   }
   
-  render() {    
+  /****
+   * Render the account ledger and show the transactions from newest to oldest
+   * 
+   * NOTE:  Sorting the transactions before rendering them everytime, not
+   *        sure if this is the most optimal, but it keeps the logic simple
+   */
+  render() {
+    // Sort the transactions from newest to oldest
+    let sorted_transactions = this.state.transactions.sort( (a,b) => {
+      let a_date = moment(a.get("date"))
+      let b_date = moment(b.get("date"))
+      
+      if( a_date.isBefore( b_date ) ) { return  1 }
+      if( a_date.isAfter(  b_date ) ) { return -1 }
+      return 0
+    })
+    
     return (
       <div>
         <h2>Account Ledger</h2>
-        <AddTransaction   addTransaction    = {this.addTransaction} />
-        <TransactionTable records           = {this.state.transactions} 
-                          updateTransaction = {this.updateTransaction}
-                          deleteTransaction = {this.deleteTransaction} />
+        <AddTransaction   addTransaction    = { this.addTransaction         } />
+        <TransactionTable records           = { sorted_transactions.toJS()  } 
+                          updateTransaction = { this.updateTransaction      }
+                          deleteTransaction = { this.deleteTransaction      } />
       </div>
     )
   }
