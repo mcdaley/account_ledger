@@ -152,12 +152,14 @@ List [  Map { "id": 1, "name": "one"    },
         Map { "id": 2, "name": "two"    } ]
 
 ## To Do
-1. Build the rails API to return the JSON responses
-2. Add a transaction
-3. Edit a transaction
-4. Delete a transaction
+[x] 1. Build the rails API to return the JSON responses
+[x] 2. Add a transaction
+[x] 3. Edit a transaction
+[x] 4. Delete a transaction
 5. Add account balance to top of the form
 6. Running balance
+7. Proptypes for handling type checks
+8. JavaScript testing
 
 ## Questions
 1. How do I load transactions on the initial page load for transactions#index?
