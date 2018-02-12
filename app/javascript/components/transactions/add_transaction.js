@@ -1,8 +1,10 @@
 //-----------------------------------------------------------------------------
 // app/javascript/components/add_transaction/add_transaction.js
 //-----------------------------------------------------------------------------
-import React        from 'react';
-import ReactDOM     from 'react-dom';
+import React        from 'react'
+import ReactDOM     from 'react-dom'
+//** import PropTypes    from 'prop-types'
+
 
 //-----------------------------------------------------------------------------
 // AddTransaction
@@ -197,3 +199,11 @@ export default class AddTransaction extends React.Component {
     )
   }
 }
+
+//-----------------------------------------------------------------------------
+// PropTypes for AddTransaction component
+//-----------------------------------------------------------------------------
+  //** AddTransaction.propTypes = {
+  //**   addTransaction:   PropTypes.func.isRequired
+  //** }
+
