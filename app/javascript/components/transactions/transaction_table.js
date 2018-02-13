@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------
 import React            from 'react'
 import ReactDOM         from 'react-dom'
+import PropTypes        from 'prop-types'
 import TransactionRow   from 'components/transactions/transaction_row';
 
 //-----------------------------------------------------------------------------
@@ -37,3 +38,11 @@ export default class TransactionTable extends React.Component {
   }
 }
 
+//-----------------------------------------------------------------------------
+// TransactionTable.propTypes
+//-----------------------------------------------------------------------------
+TransactionTable.propTypes = {
+  records:            PropTypes.array.isRequired,
+  updateTransaction:  PropTypes.func.isRequired,
+  deleteTransaction:  PropTypes.func.isRequired,
+}

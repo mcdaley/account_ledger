@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------
 import React                          from 'react'
 import ReactDOM                       from 'react-dom'
+import PropTypes                      from 'prop-types'
 import _                              from 'lodash'
 import {formatDate, formatCurrency }  from '../../utils.js'
 
@@ -303,3 +304,14 @@ export default class TransactionRow extends React.Component {
   }
 }
 
+//-----------------------------------------------------------------------------
+// TransactionRow.propTypes
+//-----------------------------------------------------------------------------
+TransactionRow.propTypes = {
+  transaction:  PropTypes.object.isRequired,
+  transaction:  PropTypes.shape({
+    date:         PropTypes.string.isRequired,
+    description:  PropTypes.string.isRequired,
+    amount:       PropTypes.number.isRequired,
+  })
+}

@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 import React        from 'react'
 import ReactDOM     from 'react-dom'
-//** import PropTypes    from 'prop-types'
+import PropTypes    from 'prop-types'
 
 
 //-----------------------------------------------------------------------------
@@ -203,7 +203,7 @@ export default class AddTransaction extends React.Component {
 //-----------------------------------------------------------------------------
 // PropTypes for AddTransaction component
 //-----------------------------------------------------------------------------
-  //** AddTransaction.propTypes = {
-  //**   addTransaction:   PropTypes.func.isRequired
-  //** }
+AddTransaction.propTypes = {
+  addTransaction:   PropTypes.func.isRequired,
+}
 
