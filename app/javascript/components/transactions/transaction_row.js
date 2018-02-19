@@ -7,6 +7,13 @@ import PropTypes                      from 'prop-types'
 import _                              from 'lodash'
 import {formatDate, formatCurrency }  from '../../utils.js'
 
+///////////////////////////////////////////////////////////////////////////////
+// TODO: 02/18/2018
+// -  LOOK AT MOVING THE AJAX FETCH CALL LOGIC FOR THE TRANSACTION CRUD
+//    API CALLS TO A SEPARATE REACT COMPONENTS, TransactionsAPI SO THAT I 
+//    CAN SEPARATE API CALLS FROM THE COMPONENT DISPLAY.
+///////////////////////////////////////////////////////////////////////////////
+
 //-----------------------------------------------------------------------------
 // TransactionRow
 //-----------------------------------------------------------------------------

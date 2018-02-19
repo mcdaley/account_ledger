@@ -2,7 +2,7 @@
   "name": "widget",
   "private": true,
   "dependencies": {
-    "@rails/webpacker": "^3.2.0",
+    "@rails/webpacker": "^3.2.2",
     "babel-preset-react": "^6.24.1",
     "coffeescript": "1.12.7",
     "es6-promise": "^4.2.4",
@@ -16,6 +16,24 @@
     "react-dom": "^16.2.0"
   },
   "devDependencies": {
-    "webpack-dev-server": "^2.11.0"
+    "babel-jest": "^22.2.2",
+    "babel-preset-env": "^1.6.1",
+    "jest": "^22.3.0",
+    "react-test-renderer": "^16.2.0",
+    "regenerator-runtime": "^0.11.1",
+    "webpack-dev-server": "^2.11.1"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "roots": [
+      "app/javascript/packs",
+      "test/javascript"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "app/javascript/packs"
+    ]
   }
 }

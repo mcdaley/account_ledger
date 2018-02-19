@@ -1,0 +1,22 @@
+/******************************************************************************
+ * app/assets/stylesheets/accounts.scss
+ ******************************************************************************/
+
+@import "global_styles";
+
+.account-balances-row {
+  margin-bottom:              0.50rem;
+}
+
+.account-card-header-debit {
+  background-color:           $state-danger-bg;
+}
+
+.account-card-body {
+  padding:                    0.25rem;
+}
+
+.account-card-title {
+  margin-bottom:              0.25rem;
+  margin-left:                1.25rem;
+}

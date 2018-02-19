@@ -5,6 +5,7 @@ import React              from 'react'
 import ReactDOM           from 'react-dom'
 import moment             from 'moment'       // Move logic to utils.js and import
 import { fromJS, Map }    from 'immutable'
+import AccountBalance     from 'components/accounts/account_balance'
 import AddTransaction     from 'components/transactions/add_transaction'
 import TransactionTable   from 'components/transactions/transaction_table'
 
@@ -24,6 +25,9 @@ export default class Ledger extends React.Component {
     this.updateTransaction    = this.updateTransaction.bind(this)
     this.deleteTransaction    = this.deleteTransaction.bind(this)
     //** this.convertTransactions  = this.convertTransactions.bind(this)
+    this.balance              = this.balance.bind(this)
+    this.credits              = this.credits.bind(this)
+    this.debits               = this.debits.bind(this)
   }
   
   /****
@@ -105,6 +109,32 @@ export default class Ledger extends React.Component {
     return
   }
   
+  /****
+   * Calculate the total balance
+   */
+  balance() {
+    let     balance = this.state.transactions.reduce( (total, t) => total + t.get('amount'), 0 )
+    return  balance
+  }
+  
+  /****
+   * Calculate the total credits
+   */
+  credits() {
+    let     credits = this.state.transactions.filter( (txn)      => txn.get('amount') >= 0 )
+                                             .reduce( (total, t) => total + t.get('amount'), 0 )
+    return  credits
+  }
+  
+  /****
+   * Calculate the total debits
+   */
+  debits() {
+    let     debits = this.state.transactions.filter( (txn)      => txn.get('amount') < 0 )
+                                            .reduce( (total, t) => total + t.get('amount'), 0 )
+    return  debits
+  }
+  
 /******************************************************************** 
   //
   // Use componebtDidMount() to load the data from an AJAX request.
@@ -146,6 +176,9 @@ export default class Ledger extends React.Component {
     return (
       <div>
         <h2>Account Ledger</h2>
+        <AccountBalance   balance           = { this.balance()              }
+                          credits           = { this.credits()              } 
+                          debits            = { this.debits()               } />
         <AddTransaction   addTransaction    = { this.addTransaction         } />
         <TransactionTable records           = { sorted_transactions.toJS()  } 
                           updateTransaction = { this.updateTransaction      }

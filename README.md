@@ -150,6 +150,35 @@ Sort the list by the "name" field
 List [  Map { "id": 1, "name": "one"    }, 
         Map { "id": 3, "name": "three"  }, 
         Map { "id": 2, "name": "two"    } ]
+        
+#### Calculate the Sum of List of Transactions
+Use the reduce() method to calculate the sum of the transactions. Need to
+pass in the variable (total) the will be returned, the element, and the 
+initial value for the total, which is 0 in the example below
+
+> const { fromJS, List } = require('immutable')
+> let arr = [ { id: 1, desc: "one",   amount:  5.00 }, 
+              { id: 2, desc: "two",   amount: -3.00 },
+              { id: 3, desc: "three", amount: 12.00 } ]
+> let txns = fromJS(arr)
+List [  Map { "id": 1, "desc": "one",   "amount":  5 }, 
+        Map { "id": 2, "desc": "two",   "amount": -3 }, 
+        Map { "id": 3, "desc": "three", "amount": 12 } ]
+> let sum = txns.reduce( (total, v) => total + v.get('amount'), 0 )
+14
+
+#### Calcuate the Debits/Credits for List of Transactions
+Use the filter() and reduce() methods to calculate the total debits and
+credits. The filter() method creates a list of elements the meet the filter
+criteria. For example to get all credits we want to filter all transactions
+with an amount >= 0.
+
+> let credits = txns.filter( (el) => el.get('amount') >= 0 )
+                    .reduce( (total, v) => total + v.get('amount'), 0 )
+                    
+NOTE: IF I TRY TO ADD THE '{' AND '}' TO THE METHOD CALL THEN THE CREDITS
+CALCULATION DOES NOT WORK, NOT SURE HOW TO FIX SO I'M LEAVING THE BRACKETS
+OFF FOR NOW.
 
 ## To Do
 [x] 1. Build the rails API to return the JSON responses
