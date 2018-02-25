@@ -16,18 +16,23 @@ array returned from transactions#index to an object with transaction.id as the k
 ### Testing with Jest and Enzyme
 **First, need to install and verify Enzyme library**
 
-1. Test the AmountBox component
+[x] 1. Test the AmountBox component
     a.) Verify label and amount using snapshots
+    - created snapshot tests for AmountBox
     
-2. Test Account Balance components
+[x] 2. Test Account Balance components
     a.) Test credits, debits, and balance using snapshots (does all 3)
+    - created snapshot tests for Account Balance components
     
 3. Test Ledger
-    a.) Load set of transactions into the component
-    b.) Test calculation for credits, debits, and balance
-    c.) Test snapshot of view
+    [x] a.) Load set of transactions into the component
+        - loaded transactions in beforeEach() block
+    [x] b.) Test calculation for credits, debits, and balance
+        - verify debits, credits, and balance calculations
+    c.) Test components (AddTransaction, TransactionTable, TransactionRow) in Ledger w/ Enzym
     d.) Add transaction and verify updates balance, credit/debit, and transactions table
     e.) Delete transaction and verify it updates balance, credit/debit, and transactions table
+    f.) Test snapshot of view
     
 4. Test TransactionTable
     a.) Load set of transactions into component
