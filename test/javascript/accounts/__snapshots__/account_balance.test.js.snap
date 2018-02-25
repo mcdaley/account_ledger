@@ -1,0 +1,74 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  className="row account-balances-row"
+>
+  <div
+    className="col-4"
+  >
+    <div
+      className="card"
+    >
+      <div
+        className="card-header"
+      >
+        Credit
+      </div>
+      <div
+        className="card-body account-card-body"
+      >
+        <h5
+          className="card-title account-card-title"
+        >
+          $200.00
+        </h5>
+      </div>
+    </div>
+  </div>
+  <div
+    className="col-4"
+  >
+    <div
+      className="card"
+    >
+      <div
+        className="card-header"
+      >
+        Debit
+      </div>
+      <div
+        className="card-body account-card-body"
+      >
+        <h5
+          className="card-title account-card-title"
+        >
+          $50.00
+        </h5>
+      </div>
+    </div>
+  </div>
+  <div
+    className="col-4"
+  >
+    <div
+      className="card"
+    >
+      <div
+        className="card-header"
+      >
+        Balance
+      </div>
+      <div
+        className="card-body account-card-body"
+      >
+        <h5
+          className="card-title account-card-title"
+        >
+          $150.00
+        </h5>
+      </div>
+    </div>
+  </div>
+</div>
+`;

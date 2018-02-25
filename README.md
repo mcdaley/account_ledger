@@ -13,6 +13,41 @@ array returned from transactions#index to an object with transaction.id as the k
     
 2.) 
 
+### Testing with Jest and Enzyme
+**First, need to install and verify Enzyme library**
+
+1. Test the AmountBox component
+    a.) Verify label and amount using snapshots
+    
+2. Test Account Balance components
+    a.) Test credits, debits, and balance using snapshots (does all 3)
+    
+3. Test Ledger
+    a.) Load set of transactions into the component
+    b.) Test calculation for credits, debits, and balance
+    c.) Test snapshot of view
+    d.) Add transaction and verify updates balance, credit/debit, and transactions table
+    e.) Delete transaction and verify it updates balance, credit/debit, and transactions table
+    
+4. Test TransactionTable
+    a.) Load set of transactions into component
+
+5. Test the TransactionRow component [HARD - DO LAST]
+    a.) Test the display?
+    b.) Test editing, verify that component values change [HARD]
+        - Click edit and verify a form is created
+        - Make change, click submit and verify that changes are saved
+        - Would need to mock the update call that returns updated transaction
+    c.) Test errors editing
+    d.) Click edit, cancel and verify nothing happens
+
+6. Test AddTransaction component [HARD]
+    a.) Test successfully adding component, what is the test?
+        - Need to mock the create() function and verify response
+    b.) Test error adding a component
+    
+7. Refactor the AJAX calls into a separate component and define API tests
+
 ### Using Maps
 For the Ledger app, the transactions can be returned as a Map of Maps, where the
 Maps unique key is the transaction.id. An advantage of the Map is that it is quicker 

@@ -13,7 +13,7 @@ export default class AmountBox extends React.Component {
   render() {
     return(
       <div className="card">
-        <div className="card-header {this.props.type}">
+        <div className="card-header">
           {this.props.text}
         </div>
         <div className="card-body account-card-body">

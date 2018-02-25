@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  className="card"
+>
+  <div
+    className="card-header"
+  >
+    Credits
+  </div>
+  <div
+    className="card-body account-card-body"
+  >
+    <h5
+      className="card-title account-card-title"
+    >
+      $55.00
+    </h5>
+  </div>
+</div>
+`;
