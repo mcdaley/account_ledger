@@ -110,6 +110,7 @@ export default class AddTransaction extends React.Component {
     let   headers         = { 'Content-Type':  'application/json',
                               'X-CSRF-Token':  csrf_token }
     
+    
     let   fetchData       = {
       method:       'POST',
       body:         JSON.stringify({ transaction: newTransaction }),
@@ -185,7 +186,7 @@ export default class AddTransaction extends React.Component {
             <div className="col-2">
               <button type        = "submit" 
                       onClick     = {this.handleSubmit} 
-                      className   = "btn btn-primary mb-2"> Add
+                      className   = "btn btn-primary mb-2 btn-submit"> Add
               </button>
               <button type        = "submit" 
                       onClick     = {this.handleClear} 
