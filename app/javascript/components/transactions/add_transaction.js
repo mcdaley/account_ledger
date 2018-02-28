@@ -171,7 +171,6 @@ export default class AddTransaction extends React.Component {
   }
   
   render() {
-    console.log("DEBUG: Entered render for add transaction form")
     return (
       <div className="card bg-info" style={{marginBottom: 0.50 + "rem"}}>
         <form className="card-body" style={{paddingTop: 0.50 + "rem", paddingBottom: 0 + "rem"}}>

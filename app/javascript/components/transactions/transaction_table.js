@@ -20,7 +20,6 @@ export default class TransactionTable extends React.Component {
                         deleteTransaction = {this.props.deleteTransaction} />
       )
     });
-    console.log("DBG: Render the transaction table")
     
     return (
       <table className="table table-striped table-bordered table-hover">

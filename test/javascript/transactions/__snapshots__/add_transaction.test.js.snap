@@ -37,7 +37,7 @@ exports[`renders correctly 1`] = `
         />
       </div>
       <div
-        className="col-5"
+        className="col-3"
       >
         <label
           className="sr-only"
@@ -59,13 +59,30 @@ exports[`renders correctly 1`] = `
         <label
           className="sr-only"
         >
-          Amount
+          Charge
         </label>
         <input
           className="form-control"
           id="txnAmount"
           onChange={[Function]}
-          placeholder="Amount"
+          placeholder="Charge"
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        className="col-2"
+      >
+        <label
+          className="sr-only"
+        >
+          Payment
+        </label>
+        <input
+          className="form-control"
+          id="txnPayment"
+          onChange={[Function]}
+          placeholder="Payment"
           type="text"
           value=""
         />

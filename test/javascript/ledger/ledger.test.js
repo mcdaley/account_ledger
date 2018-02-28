@@ -17,9 +17,9 @@ describe('<Ledger />', () => {
   
   beforeEach(() => {
     g_transactions = [
-      { id: 1, date: "2018-01-17", description: "Target",       amount: -10.0 },
-      { id: 2, date: "2018-01-24", description: "Whole Foods",  amount: -20.0 },
-      { id: 3, date: "2018-01-07", description: "Salary",       amount: 200.0 }
+      { id: 1, date: "2018-01-17", description: "Target",       charge: 10.0, payment: '',    amount: -10.0 },
+      { id: 2, date: "2018-01-24", description: "Whole Foods",  charge: 20.0, payment: '',    amount: -20.0 },
+      { id: 3, date: "2018-01-07", description: "Salary",       charge: '',   payment: 200.0, amount: 200.0 }
     ]
   })
 
