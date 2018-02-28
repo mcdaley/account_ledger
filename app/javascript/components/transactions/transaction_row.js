@@ -4,7 +4,6 @@
 import React                          from 'react'
 import ReactDOM                       from 'react-dom'
 import PropTypes                      from 'prop-types'
-import _                              from 'lodash'
 import {formatDate, formatCurrency }  from '../../utils.js'
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,7 +34,9 @@ export default class TransactionRow extends React.Component {
     
     this.handleDate         = this.handleDate.bind(this)          // Duplicated
     this.handleDescription  = this.handleDescription.bind(this)   // Duplicated
-    this.handleAmount       = this.handleAmount.bind(this)        // Duplicated
+    //** this.handleAmount       = this.handleAmount.bind(this)        // Duplicated
+    this.handleCharge       = this.handleCharge.bind(this)
+    this.handlePayment      = this.handlePayment.bind(this)
     this.handleEdit         = this.handleEdit.bind(this)
     this.toggleEdit         = this.toggleEdit.bind(this)
     this.handleUpdate       = this.handleUpdate.bind(this)
@@ -90,9 +91,33 @@ export default class TransactionRow extends React.Component {
     })
   }
   
-  handleAmount(e) {
-    let transaction    = Object.assign({}, this.state.transaction)
-    transaction.amount = e.target.value
+  /****************************************************************************
+      handleAmount(e) {
+        let transaction    = Object.assign({}, this.state.transaction)
+        transaction.amount = e.target.value
+    
+        this.setState({
+          transaction: transaction
+        })
+      }
+  *****************************************************************************/
+  
+  handleCharge(e) {
+    let transaction     = Object.assign({}, this.state.transaction)
+    transaction.charge  = e.target.value
+    transaction.amount  = -1 * transaction.charge
+    transaction.payment = ''
+    
+    this.setState({
+      transaction: transaction
+    })
+  }
+  
+  handlePayment(e) {
+    let transaction     = Object.assign({}, this.state.transaction)
+    transaction.payment = e.target.value
+    transaction.amount  = transaction.payment
+    transaction.charge  = ''
     
     this.setState({
       transaction: transaction
@@ -111,6 +136,8 @@ export default class TransactionRow extends React.Component {
     let   updateTransaction  = {
       date:         this.state.transaction.date,
       description:  this.state.transaction.description,
+      charge:       this.state.transaction.charge,
+      payment:      this.state.transaction.payment,
       amount:       this.state.transaction.amount,
     }
     
@@ -222,9 +249,10 @@ export default class TransactionRow extends React.Component {
     
     return (
       <tr>
-        <td className="text-left">  {formatDate(transaction.date)}        </td>
-        <td className="text-left">  {transaction.description}             </td>
-        <td className="text-right"> {formatCurrency(transaction.amount)}  </td>
+        <td className="text-left">  {formatDate(transaction.date)}          </td>
+        <td className="text-left">  {transaction.description}               </td>
+        <td className="text-right"> {formatCurrency(transaction.charge)}    </td>
+        <td className="text-right"> {formatCurrency(transaction.payment)}   </td>
         <td>
           <span>
             <button type      = "button" 
@@ -249,7 +277,7 @@ export default class TransactionRow extends React.Component {
     
     return (
       <tr>
-        <td colSpan="4">
+        <td colSpan="5">
           <form className="card-body" style={{paddingTop: 0.50 + "rem", paddingBottom: 0 + "rem"}}>
             <div className="form-row">
               <div className="col-3">
@@ -262,7 +290,7 @@ export default class TransactionRow extends React.Component {
                 </input>
                 { this.showErrorMessage('date') }
               </div>
-              <div className="col-4">
+              <div className="col-3">
                 <label  className   = "sr-only">Description</label>
                 <input  type        = "text" 
                         onChange    = {this.handleDescription} 
@@ -274,24 +302,35 @@ export default class TransactionRow extends React.Component {
                 { this.showErrorMessage('description') }        
               </div>
               <div className="col-2">
-                <label className    = "sr-only">Amount</label>
+                <label className    = "sr-only">Charge</label>
                 <input  type        = "text" 
-                        onChange    = {this.handleAmount} 
+                        onChange    = {this.handleCharge} 
                         className   = { this.hasError('amount') ? "form-control has-error" : "form-control" }
-                        id          = "txnAmount" 
-                        placeholder = "Amount" 
-                        value       = {transaction.amount} >
+                        id          = "txnCharge" 
+                        placeholder = "Charge" 
+                        value       = {transaction.charge} >
                 </input>
                 { this.showErrorMessage('amount') } 
               </div>
-              <div className="col-3">
+              <div className="col-2">
+                <label className    = "sr-only">Payment</label>
+                <input  type        = "text" 
+                        onChange    = {this.handlePayment} 
+                        className   = { this.hasError('amount') ? "form-control has-error" : "form-control" }
+                        id          = "txnPayment" 
+                        placeholder = "Payment" 
+                        value       = {transaction.payment} >
+                </input>
+                { this.showErrorMessage('amount') } 
+              </div>
+              <div className="col-2">
                 <span>
                   <button type        = "submit" 
                           onClick     = {this.handleUpdate} 
-                          className   = "btn btn-primary mb-2">Save</button>
+                          className   = "btn btn-sm btn-primary mb-2">Save</button>
                   <button type        = "submit" 
                           onClick     = {this.handleCancel} 
-                          className   = "btn btn-primary mb-2"
+                          className   = "btn btn-sm btn-primary mb-2"
                           style       = { {marginLeft: 0.50 + "rem"} }>Cancel</button>
                 </span>
               </div>

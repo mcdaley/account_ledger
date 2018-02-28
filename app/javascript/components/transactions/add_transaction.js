@@ -16,6 +16,8 @@ export default class AddTransaction extends React.Component {
     this.state = {
       date:         '',
       description:  '',
+      charge:       '',
+      payment:      '',
       amount:       '',
       errors:       {},
     }
@@ -23,6 +25,8 @@ export default class AddTransaction extends React.Component {
     this.handleDate         = this.handleDate.bind(this)
     this.handleDescription  = this.handleDescription.bind(this)
     this.handleAmount       = this.handleAmount.bind(this)
+    this.handleCharge       = this.handleCharge.bind(this)
+    this.handlePayment      = this.handlePayment.bind(this)
     this.handleSubmit       = this.handleSubmit.bind(this)
     this.handleClear        = this.handleClear.bind(this)
     this.resetInitialState  = this.resetInitialState.bind(this)
@@ -36,6 +40,8 @@ export default class AddTransaction extends React.Component {
     this.setState({
       date:         '',
       description:  '',
+      charge:       '',
+      payment:      '',
       amount:       '',
       errors:       {},
     })
@@ -82,6 +88,22 @@ export default class AddTransaction extends React.Component {
     })
   }
   
+  handleCharge(e) {
+    this.setState({
+      charge:   e.target.value,
+      amount:   -1 * e.target.value,
+      payment:  '',
+    })
+  }
+  
+  handlePayment(e) {
+    this.setState({
+      payment:  e.target.value,
+      amount:   e.target.value,
+      charge:   '',
+    })
+  }
+  
   handleClear(e) {
     this.resetInitialState()
   }
@@ -104,6 +126,8 @@ export default class AddTransaction extends React.Component {
     let   newTransaction  = {
       date:         this.state.date,
       description:  this.state.description,
+      charge:       this.state.charge,
+      payment:      this.state.payment,
       amount:       this.state.amount,
     }
     let   csrf_token      = document.querySelector('meta[name="csrf-token"]').content
@@ -161,7 +185,7 @@ export default class AddTransaction extends React.Component {
               </input>
               { this.showErrorMessage('date') }
             </div>
-            <div className="col-5">
+            <div className="col-3">
               <label className    = "sr-only">Description</label>
               <input  type        = "text" 
                       onChange    = {this.handleDescription} 
@@ -173,15 +197,26 @@ export default class AddTransaction extends React.Component {
               { this.showErrorMessage('description') }
             </div>
             <div className="col-2">
-              <label className    = "sr-only">Amount</label>
+              <label className    = "sr-only">Charge</label>
               <input  type        = "text" 
-                      onChange    = {this.handleAmount} 
+                      onChange    = {this.handleCharge} 
                       className   = { this.hasError('amount') ? "form-control has-error" : "form-control" }
                       id          = "txnAmount" 
-                      placeholder = "Amount" 
-                      value       = {this.state.amount} >
+                      placeholder = "Charge" 
+                      value       = {this.state.charge} >
               </input>
-              { this.showErrorMessage('amount') }
+              { this.showErrorMessage('charge') }
+            </div>
+            <div className="col-2">
+              <label className    = "sr-only">Payment</label>
+              <input  type        = "text" 
+                      onChange    = {this.handlePayment} 
+                      className   = { this.hasError('amount') ? "form-control has-error" : "form-control" }
+                      id          = "txnPayment" 
+                      placeholder = "Payment" 
+                      value       = {this.state.payment} >
+              </input>
+              { this.showErrorMessage('payment') }
             </div>
             <div className="col-2">
               <button type        = "submit" 

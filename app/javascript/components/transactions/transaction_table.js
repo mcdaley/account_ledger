@@ -28,7 +28,8 @@ export default class TransactionTable extends React.Component {
           <tr>
             <th className="text-left">  Created      </th>
             <th className="text-left">  Description  </th>
-            <th className="text-right"> Amount       </th>
+            <th className="text-right"> Charge       </th>
+            <th className="text-right"> Payment      </th>
             <th className="text-left">  Actions      </th>
           </tr>
         </thead>

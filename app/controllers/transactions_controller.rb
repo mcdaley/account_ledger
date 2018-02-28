@@ -120,7 +120,11 @@ class TransactionsController < ApplicationController
   #----------------------------------------------------------------------------
   private
     def transaction_params
-      params.require(:transaction).permit(:date, :description, :amount)
+      params.require(:transaction).permit( :date, 
+                                           :description, 
+                                           :charge, 
+                                           :payment, 
+                                           :amount )
     end
 
 end # end of class TransactionsController
