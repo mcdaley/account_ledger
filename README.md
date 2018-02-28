@@ -1,5 +1,28 @@
 # README
 
+## Overview of Accounts Ledger
+The acccount_ledger app is an example application buildt using ruby on rails and
+reactjs. It provides a simple account ledger for adding, editing, and
+deleting transactions for an account. The ledger calculated the account balance
+and total debits and credis.
+
+The goal of the app was to build my first reactjs components and to understand
+the basics of reactjs testing with jest and enzyme. The app was build with the
+following components:
+
+* rails       5.1
+* ruby        2.4.3
+* bootstrap   4.x
+* webpacker   3.2.2
+* immutablejs
+* sqlite3
+* jest
+* enzyme
+* node        9.4.0
+
+The app is based on a ruby on rails and rectjs  tutorial at:
+[Reactj.js - a guide for ruby developers](https://www.airpair.com/reactjs/posts/reactjs-a-guide-for-rails-developers#reusable-components-amount-indicators)
+
 ## Using Immutable JS Libary
 When using the Immutable JS library it is important to think about how the JSON
 returned from the API is formmatted. To use a Map the data will have to be 
@@ -225,10 +248,10 @@ OFF FOR NOW.
 [x] 2. Add a transaction
 [x] 3. Edit a transaction
 [x] 4. Delete a transaction
-5. Add account balance to top of the form
-6. Running balance
-7. Proptypes for handling type checks
-8. JavaScript testing
+[x] 5. Add account balance to top of the form
+    6. Calculate running account balance
+[x] 7. Proptypes for handling type checks
+[x] 8. JavaScript testing
 
 ## Questions
 1. How do I load transactions on the initial page load for transactions#index?
