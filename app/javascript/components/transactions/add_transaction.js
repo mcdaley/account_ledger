@@ -5,7 +5,6 @@ import React        from 'react'
 import ReactDOM     from 'react-dom'
 import PropTypes    from 'prop-types'
 
-
 //-----------------------------------------------------------------------------
 // AddTransaction
 //-----------------------------------------------------------------------------
@@ -33,6 +32,7 @@ export default class AddTransaction extends React.Component {
     this.hasError           = this.hasError.bind(this)
     this.showErrorMessage   = this.showErrorMessage.bind(this)
     this.updateErrors       = this.updateErrors.bind(this)
+    this.funk               = this.funk.bind(this)
   }
   
   resetInitialState() {
@@ -112,62 +112,80 @@ export default class AddTransaction extends React.Component {
     console.log("INFO: Entered handleSubmit")
     e.preventDefault()
     
-    ///////////////////////////////////////////////////////////////////////////
-    // TODO: 01/25/2018
-    // - NEED TO CHECK IF THE LOGIC THAT I'VE ADDED FOR THE CSRF CHECK IS 
-    //   REQUIRED IN THE HEADER AND BODY AS I TURNED OFF THE CHECK IN THE
-    //   ApplicationController CLASS. 
-    //
-    // - NEED TO BETTER UNDERSTAND THE CORS HEADERS STUFF IN ORDER TO HANDLE
-    //   THE CROSS-DOMAIN API CALLS, AS ALL APIS SHOULD NOT WORRY ABOUT THEM
-    ///////////////////////////////////////////////////////////////////////////
-    const url             = "/transactions"
-    
-    let   newTransaction  = {
+    let newTransaction = {
       date:         this.state.date,
       description:  this.state.description,
       charge:       this.state.charge,
       payment:      this.state.payment,
       amount:       this.state.amount,
     }
-    let   csrf_token      = document.querySelector('meta[name="csrf-token"]').content
-    let   headers         = { 'Content-Type':  'application/json',
-                              'X-CSRF-Token':  csrf_token }
-    
-    
-    let   fetchData       = {
-      method:       'POST',
-      body:         JSON.stringify({ transaction: newTransaction }),
-      headers:      headers,
-      mode:         'cors'
+
+    let fetchData = this.buildFetchdata(newTransaction)
+
+    try {
+      this.funk(fetchData)
+    }
+    catch(err) {
+      /////////////////////////////////////////////////////////////////////////
+      // TODO: 04/14/2018
+      // -  LOG THE ERROR AND SHOW SOME STANDARD ERROR PAGE OR MESSAGE ON
+      //    THE PAGE SHOWING ERRO
+      /////////////////////////////////////////////////////////////////////////
+      console.error('ERROR:', err)
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // TODO: 01/25/2018
+  // - NEED TO CHECK IF THE LOGIC THAT I'VE ADDED FOR THE CSRF CHECK IS 
+  //   REQUIRED IN THE HEADER AND BODY AS I TURNED OFF THE CHECK IN THE
+  //   ApplicationController CLASS. 
+  //
+  // - NEED TO BETTER UNDERSTAND THE CORS HEADERS STUFF IN ORDER TO HANDLE
+  //   THE CROSS-DOMAIN API CALLS, AS ALL APIS SHOULD NOT WORRY ABOUT THEM
+  ///////////////////////////////////////////////////////////////////////////
+  buildFetchdata(transaction) {
+    let csrf_token = document.querySelector('meta[name="csrf-token"]').content
+    let headers    = { 
+      'Content-Type':  'application/json',
+      'X-CSRF-Token':  csrf_token 
     }
     
-    //
-    // The props are not visible in the fetch block, so I need to assign it to 
-    // a variable in order to get it to work, not sure I understand the scoping
-    // of fetch.
-    //
-    let   addTransactionPtr     = this.props.addTransaction
-    let   resetInitialStatePtr  = this.resetInitialState
-    let   updateErrorsPtr       = this.updateErrors
+    let fetchData = {
+      method:   'POST',
+      body:     JSON.stringify({ transaction: transaction }),
+      headers:  headers,
+      mode:     'cors'
+    }
+
+    return fetchData
+  }
+
+  /**** 
+   * Refactored out the logic for calling the fetch() api using async
+   * and await which makes the logic a lot cleaner.
+   * 
+   * I could not call a method to build the fetchData before making
+   * the fetch calls in the async function, still not 100% sure how
+   * async/await works
+   */
+  async funk(fetchData) {
+    // Ajax Post URL
+    const url     = "/transactions"
     
-    fetch(url, fetchData)
-      .then(function(response) {
-        return response.json()
-      })
-      .then(function(data) {
-        if(data.header.code == 200) {
-          console.log("INFO: Successfully added transaction")
-          addTransactionPtr(data.body.transaction)
-          resetInitialStatePtr()
-        }
-        else {
-          // Response returned error
-          console.log("ERROR: Failed to create the transaction")
-          updateErrorsPtr(data)
-        }   
-      })
-      .catch(err => console.error('ERROR:', err))      
+    // Ajax call to add record to DB
+    let response  = await fetch(url, fetchData)
+    let data      = await response.json()
+
+    if(data.header.code == 200) {
+      console.log(`[INFO]: Successfully added the transaction to DB`)
+      this.props.addTransaction(data.body.transaction)
+      this.resetInitialState()
+    }
+    else {
+      console.log(`[ERROR]: Failed to create the transaction`)
+      this.updateErrors(data)
+    }
   }
   
   render() {
