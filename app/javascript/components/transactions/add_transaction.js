@@ -21,18 +21,19 @@ export default class AddTransaction extends React.Component {
       errors:       {},
     }
     
-    this.handleDate         = this.handleDate.bind(this)
-    this.handleDescription  = this.handleDescription.bind(this)
-    this.handleAmount       = this.handleAmount.bind(this)
-    this.handleCharge       = this.handleCharge.bind(this)
-    this.handlePayment      = this.handlePayment.bind(this)
-    this.handleSubmit       = this.handleSubmit.bind(this)
-    this.handleClear        = this.handleClear.bind(this)
-    this.resetInitialState  = this.resetInitialState.bind(this)
-    this.hasError           = this.hasError.bind(this)
-    this.showErrorMessage   = this.showErrorMessage.bind(this)
-    this.updateErrors       = this.updateErrors.bind(this)
-    this.funk               = this.funk.bind(this)
+    this.handleDate             = this.handleDate.bind(this)
+    this.handleDescription      = this.handleDescription.bind(this)
+    this.handleAmount           = this.handleAmount.bind(this)
+    this.handleCharge           = this.handleCharge.bind(this)
+    this.handlePayment          = this.handlePayment.bind(this)
+    this.handleSubmit           = this.handleSubmit.bind(this)
+    this.handleClear            = this.handleClear.bind(this)
+    this.resetInitialState      = this.resetInitialState.bind(this)
+    this.hasError               = this.hasError.bind(this)
+    this.showErrorMessage       = this.showErrorMessage.bind(this)
+    this.updateErrors           = this.updateErrors.bind(this)
+    this.buildTransaction       = this.buildTransaction.bind(this)
+    this.addTransactionRequest  = this.addTransactionRequest.bind(this)
   }
   
   resetInitialState() {
@@ -112,18 +113,11 @@ export default class AddTransaction extends React.Component {
     console.log("INFO: Entered handleSubmit")
     e.preventDefault()
     
-    let newTransaction = {
-      date:         this.state.date,
-      description:  this.state.description,
-      charge:       this.state.charge,
-      payment:      this.state.payment,
-      amount:       this.state.amount,
-    }
-
-    let fetchData = this.buildFetchdata(newTransaction)
-
     try {
-      this.funk(fetchData)
+      let transaction = this.buildTransaction()
+      let fetchData   = this.buildFetchData(transaction)
+      
+      this.addTransactionRequest(fetchData)
     }
     catch(err) {
       /////////////////////////////////////////////////////////////////////////
@@ -135,6 +129,21 @@ export default class AddTransaction extends React.Component {
     }
   }
 
+  /**** 
+   * Build the transaction that is being added to the ledger from the
+   * add transaction form inputs 
+   */
+  buildTransaction() {
+    const transaction = {
+      date:         this.state.date,
+      description:  this.state.description,
+      charge:       this.state.charge,
+      payment:      this.state.payment,
+      amount:       this.state.amount,
+    }
+    return transaction
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // TODO: 01/25/2018
   // - NEED TO CHECK IF THE LOGIC THAT I'VE ADDED FOR THE CSRF CHECK IS 
@@ -144,7 +153,7 @@ export default class AddTransaction extends React.Component {
   // - NEED TO BETTER UNDERSTAND THE CORS HEADERS STUFF IN ORDER TO HANDLE
   //   THE CROSS-DOMAIN API CALLS, AS ALL APIS SHOULD NOT WORRY ABOUT THEM
   ///////////////////////////////////////////////////////////////////////////
-  buildFetchdata(transaction) {
+  buildFetchData(transaction) {
     let csrf_token = document.querySelector('meta[name="csrf-token"]').content
     let headers    = { 
       'Content-Type':  'application/json',
@@ -169,7 +178,7 @@ export default class AddTransaction extends React.Component {
    * the fetch calls in the async function, still not 100% sure how
    * async/await works
    */
-  async funk(fetchData) {
+  async addTransactionRequest(fetchData) {
     // Ajax Post URL
     const url     = "/transactions"
     
