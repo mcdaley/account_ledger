@@ -1,59 +1,28 @@
 //-----------------------------------------------------------------------------
-// app/javascript/components/transaction_row/transaction_row.js
+// app/javascript/components/transactions/edit_transaction.jsx
 //-----------------------------------------------------------------------------
-import React                          from 'react'
-import ReactDOM                       from 'react-dom'
-import PropTypes                      from 'prop-types'
-import {formatDate, formatCurrency }  from '../../utils.js'
+import React      from 'react'
+import PropTypes  from 'prop-types'
 
-///////////////////////////////////////////////////////////////////////////////
-// TODO: 02/18/2018
-// -  LOOK AT MOVING THE AJAX FETCH CALL LOGIC FOR THE TRANSACTION CRUD
-//    API CALLS TO A SEPARATE REACT COMPONENTS, TransactionsAPI SO THAT I 
-//    CAN SEPARATE API CALLS FROM THE COMPONENT DISPLAY.
-///////////////////////////////////////////////////////////////////////////////
-
-//-----------------------------------------------------------------------------
-// TransactionRow
-//-----------------------------------------------------------------------------
-export default class TransactionRow extends React.Component {
+export default class EditTransaction extends React.Component {
   constructor(props) {
     super(props)
-    ///////////////////////////////////////////////////////////////////////////
-    // TODO: 01/26/2018
-    // - DUPLICATING THE STATE IN THE AddTransaction COMPONENT BECAUSE I NEED
-    //   TO EDIT THE FIELDS. 
-    // - DO I NEED TO REFACTOR THE LOGIC INTO A SINGLE 
-    //   COMPONENT AND THEN WRAP IT WITH THE PROPER STYLING.
-    ///////////////////////////////////////////////////////////////////////////
+
     this.state = {
-      edit:         false,
+      transaction:  this.props.transaction,
       errors:       {},
-      transaction:  this.props.transaction,                       // Duplicated
     }
-    
-    this.handleDate         = this.handleDate.bind(this)          // Duplicated
-    this.handleDescription  = this.handleDescription.bind(this)   // Duplicated
-    //** this.handleAmount       = this.handleAmount.bind(this)        // Duplicated
+
+    this.resetInitialState  = this.resetInitialState.bind(this)
+    this.updateErrors       = this.updateErrors.bind(this)
+    this.handleDate         = this.handleDate.bind(this)
+    this.handleDescription  = this.handleDescription.bind(this)
     this.handleCharge       = this.handleCharge.bind(this)
     this.handlePayment      = this.handlePayment.bind(this)
-    this.handleEdit         = this.handleEdit.bind(this)
-    this.toggleEdit         = this.toggleEdit.bind(this)
     this.handleUpdate       = this.handleUpdate.bind(this)
     this.handleCancel       = this.handleCancel.bind(this)
-    this.handleDelete       = this.handleDelete.bind(this)
-    this.updateErrors       = this.updateErrors.bind(this)
-    this.hasError           = this.hasError.bind(this)
-    this.resetInitialState  = this.resetInitialState.bind(this)
-    this.showErrorMessage   = this.showErrorMessage.bind(this)
   }
-  
-  toggleEdit() {  
-    this.setState(prevState => ({
-      edit: !prevState.edit
-    }))
-  }
-  
+
   resetInitialState() {
     this.setState(prevState => ({
       transaction:  this.props.transaction,
@@ -66,22 +35,16 @@ export default class TransactionRow extends React.Component {
       errors: data.header.errors
     })
   }
-  
-  handleEdit(e) {
-    console.log(`DEBUG: Edit the transaction, state[edit]= $(this.state.edit)`)
-    e.preventDefault()
-    this.toggleEdit()
-  }
-  
+
   handleDate(e) {
     let transaction   = Object.assign({}, this.state.transaction)
-    transaction.date = e.target.value
+    transaction.date  = e.target.value
     
     this.setState({
       transaction: transaction
     })
   }
-  
+
   handleDescription(e) {
     let transaction         = Object.assign({}, this.state.transaction)
     transaction.description = e.target.value
@@ -90,18 +53,7 @@ export default class TransactionRow extends React.Component {
       transaction: transaction
     })
   }
-  
-  /****************************************************************************
-      handleAmount(e) {
-        let transaction    = Object.assign({}, this.state.transaction)
-        transaction.amount = e.target.value
-    
-        this.setState({
-          transaction: transaction
-        })
-      }
-  *****************************************************************************/
-  
+
   handleCharge(e) {
     let transaction     = Object.assign({}, this.state.transaction)
     transaction.charge  = e.target.value
@@ -123,7 +75,7 @@ export default class TransactionRow extends React.Component {
       transaction: transaction
     })
   }
-  
+
   /****
    * Call PUT /transactions/:id to update the transaction and then call 
    * Ledger.updateTransaction to update the transaction table
@@ -158,7 +110,7 @@ export default class TransactionRow extends React.Component {
     // of fetch.
     //    
     let   updateTransactionPtr    = this.props.updateTransaction // Callback from Ledger
-    let   toggleEditPtr           = this.toggleEdit
+    let   toggleEditPtr           = this.props.toggleEdit
     let   updateErrorsPtr         = this.updateErrors
     
     fetch(url, fetchData)
@@ -168,8 +120,8 @@ export default class TransactionRow extends React.Component {
       .then(function(data) {
         console.log("INFO: Successfully updated transaction")
         if(data.header.code == 200) {
-          toggleEditPtr()
           updateTransactionPtr(data.body.transaction)
+          toggleEditPtr()
         }
         else {          
           // Response returned error
@@ -200,79 +152,11 @@ export default class TransactionRow extends React.Component {
   
   handleCancel(e) {
     e.preventDefault()
-    this.toggleEdit()
     this.resetInitialState()
+    this.props.toggleEdit()
   }
-  
-  /****
-   * Call DELTE /transactions/:id to delete the transaction from the ledger 
-   * then call the Ledger.deleteTransaction callback property
-   */
-  handleDelete(e) {  
-    console.log("DEBUG: Delete the transaction")
-    e.preventDefault()
-    
-    console.log("DEBUG: Prepare to delete the transaction") 
-    const url = `/transactions/${this.state.transaction.id}`
-        
-    let   csrf_token      = document.querySelector('meta[name="csrf-token"]').content
-    let   headers         = { 'Content-Type':  'application/json',
-                              'X-CSRF-Token':  csrf_token }
-    
-    let   fetchData       = {
-      method:       'DELETE',
-      body:         '',
-      headers:      headers,
-      mode:         'cors'
-    }
 
-    let   deleteTransactionPtr  = this.props.deleteTransaction // Callback from Ledger
-    let   transaction_id        = this.state.transaction.id
-  
-    fetch(url, fetchData)
-      .then(function(response) {
-        return response.json()
-      })
-      .then(function(transaction) {
-        console.log(`INFO: Successfully deleted transaction with id= ${transaction_id}`)
-        deleteTransactionPtr(transaction)
-      })
-      .catch(err => console.error('ERROR:', err.message))
-  }
-  
-  /****
-   * Render the transaction
-   */
-  renderTransaction() {
-    //** const transaction = this.props.transaction
-    const transaction = this.state.transaction
-    
-    return (
-      <tr>
-        <td className="text-left">  {formatDate(transaction.date)}          </td>
-        <td className="text-left">  {transaction.description}               </td>
-        <td className="text-right"> {formatCurrency(transaction.charge)}    </td>
-        <td className="text-right"> {formatCurrency(transaction.payment)}   </td>
-        <td>
-          <span>
-            <button type      = "button" 
-                    className = "btn btn-primary" 
-                    onClick   = {this.handleEdit}>   Edit    </button>
-            <button type      = "button" 
-                    className = "btn btn-danger" 
-                    style     = {{marginLeft: 0.50 + "rem"}}  
-                    onClick   = {this.handleDelete}> Delete  </button>
-          </span>
-        </td>
-      </tr>
-    )
-  }
-  
-  /****
-   * Display the inline edit transaction form
-   */
-  renderEditTransaction() {
-    //** const transaction = this.props.transaction
+  render() {
     const transaction = this.state.transaction
     
     return (
@@ -340,24 +224,4 @@ export default class TransactionRow extends React.Component {
       </tr>
     )
   }
-  
-  /****
-   * Render the transaction in the ledger, if in edit mode then render the 
-   * edit transaction form
-   */
-  render() {
-    return this.state.edit ? this.renderEditTransaction() : this.renderTransaction()
-  }
-}
-
-//-----------------------------------------------------------------------------
-// TransactionRow.propTypes
-//-----------------------------------------------------------------------------
-TransactionRow.propTypes = {
-  transaction:  PropTypes.object.isRequired,
-  transaction:  PropTypes.shape({
-    date:         PropTypes.string.isRequired,
-    description:  PropTypes.string.isRequired,
-    amount:       PropTypes.number.isRequired,
-  })
 }

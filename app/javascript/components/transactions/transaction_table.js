@@ -4,7 +4,7 @@
 import React            from 'react'
 import ReactDOM         from 'react-dom'
 import PropTypes        from 'prop-types'
-import TransactionRow   from 'components/transactions/transaction_row';
+import Transaction      from 'components/transactions/transaction';
 
 //-----------------------------------------------------------------------------
 // TransactionTable
@@ -14,10 +14,10 @@ export default class TransactionTable extends React.Component {
     let rows = []
     this.props.records.forEach((transaction) => {
       rows.push(
-        <TransactionRow key               = {transaction.id} 
-                        transaction       = {transaction} 
-                        updateTransaction = {this.props.updateTransaction}
-                        deleteTransaction = {this.props.deleteTransaction} />
+        <Transaction  key               = {transaction.id} 
+                      transaction       = {transaction} 
+                      updateTransaction = {this.props.updateTransaction}
+                      deleteTransaction = {this.props.deleteTransaction} />
       )
     });
     
