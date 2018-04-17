@@ -20,13 +20,7 @@ import EditTransaction                from './edit_transaction'
 export default class TransactionRow extends React.Component {
   constructor(props) {
     super(props)
-    ///////////////////////////////////////////////////////////////////////////
-    // TODO: 01/26/2018
-    // - DUPLICATING THE STATE IN THE AddTransaction COMPONENT BECAUSE I NEED
-    //   TO EDIT THE FIELDS. 
-    // - DO I NEED TO REFACTOR THE LOGIC INTO A SINGLE 
-    //   COMPONENT AND THEN WRAP IT WITH THE PROPER STYLING.
-    ///////////////////////////////////////////////////////////////////////////
+    
     this.state = {
       edit: false,
     }
